@@ -1,0 +1,181 @@
+us_l4code,us_l4name,color
+9r,Adin/Dixie Low Hills,#FF847B
+9q,Adin/Horsehead Mountains Forest and Woodland,#FF8576
+14g,Amargosa Desert,#FF8771
+7u,Antelope Plain,#FF886B
+8c,Arid Montane Slopes,#FF8966
+14e,Arid Valleys and Canyonlands,#FF8B60
+81k,Arizona Upland/Eastern Sonoran Mountains,#FF8C5A
+6p,Bay Flats,#FD8E53
+6t,Bay Terraces/Lower Santa Clara Valley,#FB8F4D
+13ae,Bishop Volcanic Tableland,#F99145
+6n,Bodega Coastal Hills,#F8923E
+78h,Border High-Siskiyous,#F69335
+7c,Butte Sink/Sutter and Colusa Basins,#F4952B
+6ao,Caliente Range,#F2961E
+4g,California Cascades Eastside Conifer Forest,#EF9808
+6d,Camanche Terraces,#ED9900
+6an,Carrizo Plain,#EB9A00
+4d,Cascade Subalpine/Alpine,#E99C00
+5h,Central Sierra Lower Montane Forests,#E69D00
+5g,Central Sierra Mid-Montane Forests,#E49E00
+81j,Central Sonoran/Colorado Desert Basins,#E2A000
+81i,Central Sonoran/Colorado Desert Mountains,#DFA100
+6i,Clear Lake Hills and Valleys,#DCA200
+1k,Coastal Franciscan Redwood Forest,#DAA400
+1a,Coastal Lowlands,#D7A500
+6am,Cuyama Valley,#D4A600
+14h,Death Valley/Mojave Central Trough,#D1A700
+7j,Delta,#CEA900
+6z,Diablo Range,#CBAA00
+85f,Diegan Coastal Hills and Valleys,#C8AB00
+85e,Diegan Coastal Terraces,#C5AC00
+85g,Diegan Western Granitic Foothills,#C2AD00
+78p,Duzel Rock,#BEAE00
+6r,East Bay Hills/Western Diablo Range,#BBB000
+6aa,Eastern Hills,#B8B100
+78k,Eastern Klamath Low Elevation Forests,#B4B200
+78l,Eastern Klamath Montane Forests,#B0B300
+14a,Eastern Mojave Basins,#ACB400
+14b,Eastern Mojave Low Ranges and Arid Footslopes,#A8B500
+14c,Eastern Mojave Mountain Woodland and Shrubland,#A4B600
+5i,Eastern Sierra Great Basin Slopes,#A0B700
+5j,Eastern Sierra Mojavean Slopes,#9CB800
+6f,Foothill Ridges and Valleys,#97B900
+1l,Fort Bragg/Fort Ross Terraces,#93BA00
+9h,Fremont Pine/Fir Forest,#8EBB00
+6y,Gabilan Range,#89BC00
+7p,Granitic Alluvial Fans and Terraces,#84BD00
+6ad,Grapevine Transition,#7EBE00
+9n,High Elevation Warner Mountains,#78BF00
+80g,High Lava Plains,#72BF00
+78r,High North Coast Ranges,#6CC000
+4e,High Southern Cascades Montane Forest,#65C100
+81f,Imperial/Lower Coachella Valleys,#5DC200
+85l,Inland Hills,#55C300
+78e,Inland Siskiyous,#4BC306
+85k,Inland Valleys,#40C41C
+6ai,Interior Santa Lucia Range,#33C529
+7s,Kern Terraces,#20C633
+1j,King Range/Mattole Basin,#00C63C
+9j,Klamath Juniper Woodland/Devils Garden,#00C744
+78g,Klamath River Ridges,#00C84B
+78o,Klamath Subalpine,#00C851
+9g,Klamath/Goose Lake Basins,#00C958
+13h,Lahontan and Tonopah Playas,#00C95D
+6x,Leeward Hills/Western Diablo Range,#00CA63
+9o,Likely Tableland,#00CA69
+6u,Livermore Hills and Valleys,#00CB6E
+7k,Lodi Alluvium,#00CB73
+85d,Los Angeles Plain,#00CC78
+4f,Low Southern Cascades Mixed Conifer Forest,#00CC7D
+81g,Lower Colorado/Gila River Valleys,#00CC82
+7n,Manteca/Merced Alluvium,#00CD86
+78m,Marble/Salmon Mountains-Trinity Alps,#00CD8B
+6o,Marin Hills,#00CD8F
+6j,Mayacmas Mountains,#00CE94
+14i,Mesquite Flat/Badwater Basin,#00CE98
+9s,Modoc Lava Flows and Buttes,#00CE9C
+9p,Modoc/Lassen Juniper-Shrub Hills and Mountains,#00CEA1
+14n,Mojave Lava Fields,#00CEA5
+14f,Mojave Playas,#00CEA9
+14o,Mojave Sand Dunes,#00CEAD
+13ad,Mono-Adobe Valleys,#00CEB1
+6w,Monterey Bay Plains and Terraces,#00CEB5
+85h,Morena/Boundary Mountain Chaparral,#00CEB9
+6k,Napa-Sonoma-Lake Volcanic Highlands,#00CEBC
+6l,Napa-Sonoma-Russian River Valleys,#00CEC0
+6g,North Coast Range Eastern Slopes,#00CEC4
+7b,North Valley Alluvium,#00CEC7
+5f,Northeastern Sierra Mixed Conifer-Pine Forests,#00CDCB
+85i,Northern Channel Islands,#00CDCE
+1i,Northern Franciscan Redwood Forest,#00CDD2
+6ag,Northern Santa Lucia Range,#00CCD5
+5e,Northern Sierra Lower Montane Forests,#00CCD9
+5d,Northern Sierra Mid-Montane Forests,#00CBDC
+5b,Northern Sierra Subalpine Forests,#00CBDF
+5c,Northern Sierra Upper Montane Forests,#00CAE2
+6b,Northern Sierran Foothills,#00C9E5
+7a,Northern Terraces,#00C9E8
+8g,Northern Transverse Range,#00C8EB
+9t,Old Cascades,#00C7EE
+78q,Outer North Coast Ranges,#00C6F1
+85b,Oxnard Plain and Valleys,#00C5F4
+7q,Panoche and Cantua Fans and Basins,#00C4F6
+6ak,Paso Robles Hills and Valleys,#00C3F9
+9l,Pit River Valleys,#00C2FB
+6ab,Pleasant Valley/Kettleman Plain,#00C1FE
+80d,Pluvial Lake Basins,#00C0FF
+1m,Point Reyes/Farallon Islands,#00BEFF
+78a,Rogue/Illinois/Scott Valleys,#00BDFF
+7e,Sacramento/Feather Riverine Alluvium,#00BCFF
+6af,Salinas Valley,#00BAFF
+6al,Salinas-Cholame Hills,#00B9FF
+6s,San Francisco Peninsula,#00B7FF
+7m,San Joaquin Basin,#00B6FF
+1o,San Mateo Coastal Hills,#00B4FF
+81d,Sand Hills/Sand Dunes,#25B2FF
+85m,Santa Ana Mountains,#3DB1FF
+85a,Santa Barbara Coastal Plain and Terraces,#4EAFFF
+1n,Santa Cruz Mountains,#5CADFF
+6ah,Santa Lucia Coastal Forest and Woodland,#67ABFF
+6aq,Santa Maria/Santa Ynez Valleys,#72A9FF
+78n,Scott Mountains,#7BA7FF
+80j,Semiarid Uplands,#84A5FF
+78d,Serpentine Siskiyous,#8CA3FF
+9k,Shasta Valley,#94A1FF
+13y,Sierra Nevada-Influenced High Elevation Mountains,#9B9FFF
+13x,Sierra Nevada-Influenced Ranges,#A29DFF
+13aa,Sierra Nevada-Influenced Semiarid Hills and Basins,#A99BFF
+13ab,Sierra Valley,#AF99FF
+5a,Sierran Alpine,#B597FF
+6ap,Solomon-Purisima-Santa Ynez Hills,#BB95FF
+6m,Sonoma-Mendocino Mixed Forest,#C093FF
+81h,Sonoran Playas,#C691FF
+7t,South Valley Alluvium,#CB8FFF
+8e,Southern California Lower Montane Shrub and Woodland,#CF8DFF
+8f,Southern California Montane Conifer Forest,#D48BFF
+8d,Southern California Subalpine/Alpine,#D889FF
+4h,Southern Cascades Foothills,#DC87FF
+9i,Southern Cascades Slope,#E085FF
+85j,Southern Channel Islands,#E483FF
+7v,Southern Clayey Basins,#E881FF
+7d,Southern Hardpan Terraces,#EB80FF
+6aj,Southern Santa Lucia Range,#EF7EFF
+5n,Southern Sierra Lower Montane Forest and Woodland,#F27CFF
+5m,Southern Sierra Mid-Montane Forests,#F47BFF
+5k,Southern Sierra Subalpine Forests,#F779FE
+5l,Southern Sierra Upper Montane Forests,#FA78FC
+6c,Southern Sierran Foothills,#FC77F9
+7l,Stockton Basin,#FF76F6
+6q,Suisun Terraces and Low Hills,#FF75F4
+7f,Sutter Buttes,#FF74F1
+6ae,Tehachapi Foothills,#FF73EE
+5o,Tehachapi Mountains,#FF72EB
+6e,Tehama Terraces,#FF72E8
+6ac,Temblor Range/Elk Hills,#FF71E5
+13u,Tonopah Basin,#FF71E2
+13v,Tonopah Sagebrush Foothills,#FF71DE
+7r,Tulare Basin/Fresno Slough,#FF71DB
+6a,Tuscan Flows,#FF71D8
+81e,Upper Coachella Valley and Hills,#FF71D4
+13ac,Upper Owens Valley,#FF71D1
+6ar,Upper Sacramento River Alluvium,#FF71CD
+6v,Upper Santa Clara Valley,#FF72C9
+85c,Venturan-Angeleno Coastal Hills,#FF72C5
+9m,Warner Mountains,#FF73C2
+78i,Western Klamath Low Elevation Forests,#FF73BE
+78j,Western Klamath Montane Forests,#FF74BA
+14j,Western Mojave Basins,#FF75B6
+14m,Western Mojave High Elevation Mountains,#FF76B2
+14k,Western Mojave Low Ranges and Arid Footslopes,#FF77AD
+14l,Western Mojave Mountain Woodland and Shrubland,#FF78A9
+81c,Western Sonoran Basins,#FF79A5
+81b,Western Sonoran Mountain Woodland and Shrubland,#FF7AA1
+81a,Western Sonoran Mountains,#FF7B9C
+8a,Western Transverse Range Lower Montane Shrub and Woodland,#FF7C98
+8b,Western Transverse Range Montane Forest,#FF7D93
+6h,Western Valley Foothills/Dunnigan Hills,#FF7F8E
+7o,Westside Alluvial Fans and Terraces,#FF808A
+7g,Yolo Alluvial Fans,#FF8185
+7h,Yolo/American Basin,#FF8380

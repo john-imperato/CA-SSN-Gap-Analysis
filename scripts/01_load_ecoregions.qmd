@@ -1,0 +1,171 @@
+---
+title: "CA-SSN Gap Analysis – Ecoregion Loading"
+author: "John Imperato"
+format:
+  html:
+    code-fold: true
+    toc: true
+    toc-depth: 2
+editor: visual
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+
+
+```{r}
+# scripts/01_load_ecoregions.R
+# Load EPA Ecoregions (Level IV) and write a clean GeoPackage copy
+
+# Load packages
+suppressPackageStartupMessages({
+  library(sf)
+  library(dplyr)
+  library(janitor)
+})
+
+# Set paths (using absolute path that works)
+base_path <- "/Users/johnimperato/Desktop/CA-SSN/CA-SSN-Gap-Analysis"
+shp_path <- file.path(base_path, "data", "EPA_ecoregions_CA", "ca_eco_l4", "ca_eco_l4.shp")
+out_dir <- file.path(base_path, "data", "processed")
+out_gpkg <- file.path(out_dir, "Ecoregions.gpkg")
+
+# Create output directory if needed
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+
+# Read shapefile
+eco <- st_read(shp_path, quiet = TRUE)
+
+# Clean column names
+eco <- clean_names(eco)
+
+# Print summary
+cat("EPA Level IV Ecoregions loaded:\n")
+cat("  Features:", nrow(eco), "\n")
+cat("  CRS:", st_crs(eco)$input, "\n")
+cat("  Columns:", ncol(eco), "\n")
+
+# Transform to WGS84
+eco_wgs84 <- st_transform(eco, 4326)
+
+# Write to GeoPackage
+st_write(eco_wgs84, 
+         out_gpkg,
+         layer = "EPA_L4_CA", 
+         delete_layer = TRUE, 
+         quiet = TRUE)
+
+cat("\nSaved to:", out_gpkg, "\n")
+cat("  Layer: EPA_L4_CA\n")
+cat("  CRS: WGS84 (EPSG:4326)\n")
+```
+
+```{r}
+
+# Explore EPA Ecoregions GeoPackage
+
+# Load packages
+library(sf)
+library(dplyr)
+library(ggplot2)
+
+# Set base path (same as before)
+base_path <- "/Users/johnimperato/Desktop/CA-SSN/CA-SSN-Gap-Analysis"
+gpkg_path <- file.path(base_path, "data", "processed", "Ecoregions.gpkg")
+
+# Read the GeoPackage
+eco <- st_read(gpkg_path, 
+               layer = "EPA_L4_CA", 
+               quiet = TRUE)
+
+# Basic information
+cat("=== BASIC INFORMATION ===\n")
+cat("Features (rows):", nrow(eco), "\n")
+cat("Variables (columns):", ncol(eco), "\n")
+cat("Geometry type:", st_geometry_type(eco)[1], "\n")
+cat("CRS:", st_crs(eco)$input, "\n")
+cat("Bounding box:\n")
+print(st_bbox(eco))
+
+# Column names and types
+cat("\n=== COLUMN STRUCTURE ===\n")
+str(eco %>% st_drop_geometry())
+
+# Preview first few rows (without geometry)
+cat("\n=== FIRST 5 ROWS (without geometry) ===\n")
+print(eco %>% 
+      st_drop_geometry() %>% 
+      head(5))
+
+# Summary statistics for numeric columns
+cat("\n=== NUMERIC COLUMN SUMMARY ===\n")
+eco %>% 
+  st_drop_geometry() %>% 
+  select(where(is.numeric)) %>% 
+  summary() %>% 
+  print()
+
+# Unique values in key categorical columns
+cat("\n=== UNIQUE VALUES IN KEY COLUMNS ===\n")
+cat("Unique Level 4 ecoregions:", n_distinct(eco$us_l4code), "\n")
+cat("Unique Level 3 ecoregions:", n_distinct(eco$us_l3code), "\n")
+cat("Unique Level 2 ecoregions:", n_distinct(eco$na_l2code), "\n")
+cat("Unique Level 1 ecoregions:", n_distinct(eco$na_l1code), "\n")
+
+# Most common Level 3 ecoregions
+cat("\n=== TOP 10 LEVEL 3 ECOREGIONS BY POLYGON COUNT ===\n")
+eco %>% 
+  st_drop_geometry() %>% 
+  count(us_l3name, sort = TRUE) %>% 
+  head(10) %>% 
+  print()
+
+# Area calculations
+cat("\n=== AREA STATISTICS ===\n")
+eco_with_area <- eco %>%
+  mutate(area_km2 = as.numeric(st_area(.) / 1e6))  # Convert to km²
+
+cat("Total area:", format(sum(eco_with_area$area_km2), big.mark=","), "km²\n")
+cat("Mean polygon area:", format(mean(eco_with_area$area_km2), big.mark=","), "km²\n")
+cat("Median polygon area:", format(median(eco_with_area$area_km2), big.mark=","), "km²\n")
+cat("Smallest polygon:", format(min(eco_with_area$area_km2), digits=2), "km²\n")
+cat("Largest polygon:", format(max(eco_with_area$area_km2), big.mark=","), "km²\n")
+
+# Simple visualization
+cat("\n=== CREATING VISUALIZATION ===\n")
+p <- ggplot(eco) +
+  geom_sf(aes(fill = us_l3name), show.legend = FALSE) +
+  theme_minimal() +
+  labs(title = "EPA Level IV Ecoregions of California",
+       subtitle = paste(nrow(eco), "polygons colored by Level 3 ecoregion")) +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank())
+
+print(p)
+
+# Check for any potential data issues
+cat("\n=== DATA QUALITY CHECKS ===\n")
+cat("Missing values per column:\n")
+eco %>% 
+  st_drop_geometry() %>% 
+  summarise(across(everything(), ~sum(is.na(.)))) %>% 
+  tidyr::pivot_longer(everything(), names_to = "column", values_to = "missing") %>% 
+  filter(missing > 0) %>% 
+  {if(nrow(.) > 0) print(.) else cat("  No missing values found\n")}
+
+# Check geometry validity
+invalid_geoms <- sum(!st_is_valid(eco))
+cat("\nInvalid geometries:", invalid_geoms, "\n")
+if(invalid_geoms > 0) {
+  cat("  Consider running: eco <- st_make_valid(eco)\n")
+}
+
+cat("\n=== EXPLORATION COMPLETE ===\n")
+
+```
+
+
+

@@ -1,0 +1,81 @@
+org,site_id,site_name,lon,lat,county
+CDFW,SSN_CDFW_1,Fitzhugh Creek Wildlife Area,-120.37899,41.36612,NA
+CDFW,SSN_CDFW_2,Honey Lake Wildlife Area,-120.30266,40.35106,NA
+CDFW,SSN_CDFW_3,Tehama Wildlife Area,-121.8910738,40.3126859,NA
+CDFW,SSN_CDFW_4,Spenceville Wildlife Area,-121.280279,39.13258372,NA
+CDFW,SSN_CDFW_5,Cañada de Los Osos Ecological Reserve,-121.3918797,37.04971065,NA
+CDFW,SSN_CDFW_6,Big Sandy Wildlife Area,-120.7284066,35.78849982,NA
+CDFW,SSN_CDFW_7,Monache Meadows Wildlife Area,-118.178079,36.225573,NA
+CDFW,SSN_CDFW_8,Big Table Mountain Ecological Reserve,-119.596611285,37.04807335,NA
+CDFW,SSN_CDFW_9,Palo Verde Ecological Reserve,-114.532622,33.690904,NA
+CDFW,SSN_CDFW_10,Hope Valley Wildlife Area,-119.92893,38.77263,NA
+CDFW,SSN_CDFW_11,Great Basin Springs (Five Springs),-120.13537,40.53486,NA
+CDFW,SSN_CDFW_12,North Grasslands Wildlife Area,-120.81362,37.16112,NA
+CDFW,SSN_CDFW_13,Semitropic Ecological Reserve,-119.61261,35.70375,NA
+CDFW,SSN_CDFW_14,Lake Earl Wildlife Area,-124.1869,41.86198,NA
+CDFW,SSN_CDFW_15,Ash Creek Wildlife Area,-121.07148,41.14772,NA
+CDFW,SSN_CDFW_16,Pickel Meadow Wildlife Area,-119.5311,38.347453,NA
+CDFW,SSN_CDFW_17,Cosumnes River Ecological Reserve,-121.378935,38.277081,NA
+CDFW,SSN_CDFW_18,Camp Cady Wildlife Area,-116.6084,34.93652,NA
+CDFW,SSN_CDFW_19,Indian Joe Springs Ecological Reserve,-117.38765,35.82482,NA
+CDFW,SSN_CDFW_20,San Elijo Lagoon Ecological Reserve,-117.2577,33.00982,NA
+CDFW,SSN_CDFW_21,Sycuan Peak Ecological Reserve,-116.79953,32.77,NA
+CDFW,SSN_CDFW_22,Canebrake Ecological Reserve,-118.18714,35.70627,NA
+CDFW,SSN_CDFW_23,Carrizo Plains Ecological Reserve,-119.956899,35.150179,NA
+CDFW,SSN_CDFW_24,Fish Slough Ecological Reserve,-118.4007089,37.454736,NA
+CDFW,SSN_CDFW_25,San Felipe Creek Ecological Reserve,-115.916556,33.0917566,NA
+CDFW,SSN_CDFW_26,Watsonville Slough Ecological Reserve,-121.7879741,36.91053641,NA
+CDFW,SSN_CDFW_27,Imperial Wildlife Area,-115.57808,33.28127,NA
+CDFW,SSN_CDFW_28,Napa-Sonoma Marshes Wildlife Area,-122.35361,38.21691,NA
+CDFW,SSN_CDFW_29,Shasta Valley Wildlife Area,-122.50182,41.71851,NA
+CDFW,SSN_CDFW_30,Upper Butte Basin Wildlife Area,-121.87533,39.39887,NA
+CDFW,SSN_CDFW_31,McLellan Mountain Peatland,-123.670269,40.4774892,NA
+CDFW,SSN_CDFW_32,Hallelujah Junction Wildlife Area,-120.0226762,39.69254404,NA
+CDFW,SSN_CDFW_33,Burton Mesa Ecological Reserve,-120.41006,34.70879,NA
+CDFW,SSN_CDFW_34,Canada de San Vicente Ecological Reserve,-116.866626,32.98525,NA
+CDFW,SSN_CDFW_35,Cienega Springs Ecological Reserve,-118.889293,34.39176,NA
+CDFW,SSN_CDFW_36,Rancho Jamul Ecological Reserve,-116.856382,32.67681,NA
+CDFW,SSN_CDFW_37,San Felipe Valley Wildlife Area,-116.525057,33.11258,NA
+CDFW,SSN_CDFW_38,Elkhorn Slough Ecological Reserve,-121.742222,36.815556,NA
+CDFW,SSN_CDFW_39,Upper Newport Bay Ecological Reserve,-117.891975,33.62067,NA
+UCNRS,SSN_UCNRS_40,Angelo Reserve,-123.6444128,39.73065196,Mendocino
+UCNRS,SSN_UCNRS_41,Ano Nuevo Island,-122.3371299,37.10872232,San Mateo
+UCNRS,SSN_UCNRS_42,Anza Borrego,-116.3888449,33.24041103,San Diego
+UCNRS,SSN_UCNRS_43,Blue Oak Ranch Reserve,-121.7372161,37.3815,Santa Clara
+UCNRS,SSN_UCNRS_44,Bodega Marine Lab and Reserve,-123.0714206,38.31817307,Sonoma
+UCNRS,SSN_UCNRS_45,Boyd Deep Canyon Reserve,-116.3765258,33.64800179,Riverside
+UCNRS,SSN_UCNRS_46,Burns Piñon Ridge Reserve,-116.4531977,34.14891347,San Bernardino
+UCNRS,SSN_UCNRS_47,Carpinteria Marsh Reserve,-119.5340486,34.40050117,Santa Barbara
+UCNRS,SSN_UCNRS_48,Coal Oil Point Reserve,-119.8782827,34.40773718,Santa Barbara
+UCNRS,SSN_UCNRS_49,Dawson Reserve,-117.248671,33.14872192,San Diego
+UCNRS,SSN_UCNRS_50,Elliot Chaparral Reserve,-117.0989232,32.89116514,San Diego
+UCNRS,SSN_UCNRS_51,Fort Ord,-121.7759046,36.68160368,Monterey
+UCNRS,SSN_UCNRS_52,Granites Desert Research Station,-115.6535993,34.78162125,San Bernardino
+UCNRS,SSN_UCNRS_53,Hastings Natural Reservation,-121.5498692,36.38733797,Monterey
+UCNRS,SSN_UCNRS_54,James Reserve,-116.7751735,33.80899655,Riverside
+UCNRS,SSN_UCNRS_55,Jepson Praire Reserve,-121.8233923,38.27529291,Solano
+UCNRS,SSN_UCNRS_56,Ken Norris Rancho Marino Reserve,-121.0915103,35.54018956,San Luis Obispo
+UCNRS,SSN_UCNRS_57,Kendal-Frost Marsh Reserve,-117.2286532,32.79349147,San Diego
+UCNRS,SSN_UCNRS_58,Landels Hill Big Creek Reserve,-121.5980125,36.07156389,Monterey
+UCNRS,SSN_UCNRS_59,Lassen Field Station,-121.4302414,40.49705184,Shasta
+UCNRS,SSN_UCNRS_60,McLaughlin Reserve,-122.4155721,38.86279842,Lake
+UCNRS,SSN_UCNRS_61,Merced Vernal Pools,-120.350994,37.4087909,Merced
+UCNRS,SSN_UCNRS_62,Motte Rimrock Reserve,-117.2598556,33.80418827,Riverside
+UCNRS,SSN_UCNRS_63,Quail Ridge Reserve,-122.1493574,38.48307732,Napa
+UCNRS,SSN_UCNRS_64,Sagehen Creek Field Station,-120.241348,39.432056,Nevada
+UCNRS,SSN_UCNRS_65,San Joaquin Marsh Reserve,-117.8525563,33.65747393,Orange
+UCNRS,SSN_UCNRS_66,Santa Cruz Island Reserve,-119.7147477,33.99557257,Santa Barbara
+UCNRS,SSN_UCNRS_67,Scripps Coastal Reserve,-117.2491489,32.87525321,San Diego
+UCNRS,SSN_UCNRS_68,Sedgwick Reserve,-120.041112,34.69283827,Santa Barbara
+UCNRS,SSN_UCNRS_69,Sierra Nevada Aquatic Research Lab,-118.8317641,37.61383278,Mono
+UCNRS,SSN_UCNRS_70,Stebbins Cold Canyon Reserve,-122.102005,38.49648405,Solano
+UCNRS,SSN_UCNRS_71,Strathearn,-121.162925,36.833735,NA
+UCNRS,SSN_UCNRS_72,Stunt Ranch Reserve,-118.6568888,34.09433986,Los Angeles
+UCNRS,SSN_UCNRS_73,Valentine Reserve,-118.9953291,37.62977746,Mono
+UCNRS,SSN_UCNRS_74,White Mountain Research Center,-118.3263448,37.36009798,Inyo
+UCNRS,SSN_UCNRS_75,Yosemite Field Station,-119.6579113,37.53993719,Mariposa
+UCNRS,SSN_UCNRS_76,Younger Lagoon,-122.0654556,36.95083144,Santa Cruz
+TNC,SSN_TNC_77,Dangermond @ Jalama HQ,-120.458713,34.51683,NA
+TNC,SSN_TNC_78,Santa Cruz Island @ Diablo Peak,-119.784298,34.02901,NA
+TNC,SSN_TNC_79,Santa Cruz Island @ Sierra Blanca,-119.820315,33.9815,NA
+Pepperwood,SSN_Pepperwood_80,Pepperwood Preserve,-122.6895479,38.56999427,NA

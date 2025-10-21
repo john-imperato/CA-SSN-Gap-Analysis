@@ -1,0 +1,570 @@
+---
+title: "Spatial join"
+format: pdf
+editor: visual
+---
+
+## Step 1: Load data
+
+Load the processed Sentinel Sites and EPA ecoregions, clean field names, and align CRS so layers match.
+
+```{r step-01-load, message=FALSE, warning=FALSE}
+
+# Minimal, robust loader using the .here sentinel
+for (p in c("here","sf","janitor")) if (!requireNamespace(p, quietly = TRUE)) install.packages(p)
+library(here); library(sf); library(janitor)
+
+sites_gpkg <- here::here("data","processed","SSN_All_Sites.gpkg")
+eco_gpkg   <- here::here("data","processed","Ecoregions.gpkg")
+
+sites <- st_read(sites_gpkg, layer = "SSN_All_Sites", quiet = TRUE) |> clean_names()
+eco   <- st_read(eco_gpkg,   layer = "EPA_L4_CA",     quiet = TRUE) |> clean_names() |> st_make_valid()
+
+if (!is.na(st_crs(sites)) && !is.na(st_crs(eco)) && st_crs(sites) != st_crs(eco)) {
+  sites <- st_transform(sites, st_crs(eco))
+}
+
+```
+
+## Step 2: Spatial join (Sentinel Sites × US EPA ecoregions)
+
+Attach Level III and Level IV ecoregion attributes to each Sentinel Site using an intersects join.
+
+### 2a: Perform join
+
+```{r step-02a-spatial-join, message=FALSE, warning=FALSE}
+
+# Step 2a — Spatial join (Sentinel Sites × EPA Level IV ecoregions)
+library(dplyr); library(sf)
+
+need <- c("us_l4code","us_l4name","l4_key","us_l3code","us_l3name","l3_key")
+eco_keep <- if (all(need %in% names(eco))) dplyr::select(eco, dplyr::all_of(need)) else eco
+
+sites_with_eco <- sf::st_join(
+  x = sites,
+  y = eco_keep,
+  join = sf::st_intersects,
+  left = TRUE,
+  largest = TRUE
+)
+
+n_unmatched <- sum(is.na(sites_with_eco$us_l4code))
+cat("Spatial join complete —", nrow(sites_with_eco), "sites processed;", n_unmatched, "unmatched.\n")
+
+```
+
+### 2b: Inspect joined data
+
+```{r step-02b-inspect, message=FALSE, warning=FALSE}
+
+# Step 2b — Inspect joined data (quick QA only)
+library(dplyr); library(sf)
+
+cat("Rows:", nrow(sites_with_eco), "| Columns:", ncol(sites_with_eco), "\n")
+print(head(names(sites_with_eco), 15))
+
+print(
+  sites_with_eco |>
+    sf::st_drop_geometry() |>
+    dplyr::select(org, contains("l3"), contains("l4")) |>
+    head(10)
+)
+
+eco_counts <- sites_with_eco |>
+  sf::st_drop_geometry() |>
+  dplyr::summarise(
+    n_L3 = dplyr::n_distinct(us_l3code, na.rm = TRUE),
+    n_L4 = dplyr::n_distinct(us_l4code, na.rm = TRUE)
+  )
+print(eco_counts)
+
+n_unmatched <- sum(is.na(sites_with_eco$us_l4code))
+cat("Unmatched sites (no L4):", n_unmatched, "\n")
+
+```
+
+### 2c: Save joined outputs
+
+```{r step-02c-save-joined, message=FALSE, warning=FALSE}
+# Step 3 — Save joined outputs (GeoPackage + lookup CSV)
+
+gpkg_out   <- here::here("data","processed","SSN_Sites_with_Ecoregions.gpkg")
+layer_name <- "SSN_Sites_with_Ecoregions"
+tbl_dir    <- here::here("outputs","tables")
+dir.create(tbl_dir, recursive = TRUE, showWarnings = FALSE)
+
+if (file.exists(gpkg_out)) try(sf::st_delete(gpkg_out, layer = layer_name), silent = TRUE)
+sf::st_write(sites_with_eco, gpkg_out, layer = layer_name, delete_layer = TRUE, quiet = TRUE)
+cat("Wrote GeoPackage:", normalizePath(gpkg_out), "\n")
+
+site_lookup <- sites_with_eco |>
+  sf::st_drop_geometry() |>
+  dplyr::select(site_id, site_name, org, us_l3code, us_l3name, us_l4code, us_l4name) |>
+  dplyr::arrange(org, us_l3name, us_l4name)
+
+csv_out <- file.path(tbl_dir, "Sites_with_Ecoregions.csv")
+readr::write_csv(site_lookup, csv_out)
+cat("Wrote lookup table:", normalizePath(csv_out), "\n")
+```
+
+## Step 3: Visualize the data
+
+### 3a: Map Sentinel sites on level III ecoregions
+
+```{r step-03a-map-L3-SSN, message=FALSE, warning=FALSE, fig.width=14, fig.height=14}
+
+# Ensure WGS84
+if (st_crs(sites_with_eco)$epsg != 4326) sites_with_eco <- st_transform(sites_with_eco, 4326)
+if (st_crs(eco)$epsg             != 4326) eco             <- st_transform(eco, 4326)
+
+# Dissolve to Level III for clean fills
+eco_l3 <- eco |>
+  st_make_valid() |>
+  group_by(us_l3code, us_l3name) |>
+  summarise(.groups = "drop")
+
+# Org palette for sites
+org_levels <- sort(unique(as.character(sites_with_eco$org)))
+org_palette <- if (length(org_levels) <= 9) {
+  pal <- RColorBrewer::brewer.pal(max(3, length(org_levels)), "Set1")
+  pal[seq_along(org_levels)]
+} else scales::hue_pal()(length(org_levels))
+names(org_palette) <- org_levels
+
+ggplot() +
+  # --- POLYGONS (fill by Level III; keep legend) ---
+  geom_sf(data = eco_l3, aes(fill = us_l3name), color = NA, alpha = 0.80) +
+  scale_fill_discrete(name = "US EPA Level III Ecoregion") +
+
+  # Start a NEW fill scale for site points
+  ggnewscale::new_scale_fill() +
+
+  # --- SITES (filled circles with black outline = "halo") ---
+  geom_sf(
+    data  = sites_with_eco,
+    aes(fill = org),
+    shape = 21,           # filled circle with outline
+    color = "black",      # outline (halo)
+    stroke = 0.7,         # outline thickness
+    size  = 3.6,          # symbol size
+    alpha = 0.95
+  ) +
+  scale_fill_manual(name = "CA Sentinel Sites", values = org_palette) +
+
+  # North arrow (bottom-left)
+  annotation_north_arrow(
+    location = "bl",
+    which_north = "true",
+    height = unit(2.0, "cm"),
+    width  = unit(1.5, "cm"),
+    pad_x  = unit(1, "cm"),
+    pad_y  = unit(4, "cm"),
+    style  = north_arrow_orienteering
+  ) +
+
+  # Scale bar (bottom-left, just above the north arrow)
+  annotation_scale(
+    location  = "bl",
+    width_hint = 0.3,
+    bar_cols   = c("grey40", "white"),
+    pad_x      = unit(0.5, "cm"),
+    pad_y      = unit(2, "cm"),
+    text_cex   = 2
+  ) +
+
+  coord_sf(expand = FALSE) +
+  theme_void() +
+  theme(
+    legend.position   = c(0.85, 0.8),
+    legend.box        = "vertical",
+    legend.title      = element_text(size = 20, face = "bold"),
+    legend.text       = element_text(size = 18),
+    legend.key.width  = unit(.7, "cm"),
+    legend.key.height = unit(.7, "cm"),
+    legend.spacing.y  = unit(0.12, "cm"),
+    legend.spacing.x  = unit(0.2, "cm"),
+    plot.margin       = unit(c(0.4, 0.6, 0.4, 0.4), "cm")
+  ) +
+  guides(
+    # Bigger, haloed legend points for sites
+    fill = guide_legend(override.aes = list(shape = 21, size = 5, color = "black", stroke = 0.9))
+  )
+
+```
+
+### 3b: Map Sentinel Sites on L4 ecoregions
+
+```{r step-03b-map-L4-SSN, message=FALSE, warning=FALSE, fig.width=14, fig.height=14}
+
+# Ensure WGS84
+if (st_crs(sites_with_eco)$epsg != 4326) sites_with_eco <- st_transform(sites_with_eco, 4326)
+if (st_crs(eco)$epsg             != 4326) eco             <- st_transform(eco, 4326)
+
+# Dissolve to Level IV polygons (unique by code + name)
+eco_l4 <- eco |>
+  st_make_valid() |>
+  dplyr::group_by(us_l4code, us_l4name) |>
+  dplyr::summarise(.groups = "drop")
+
+# Keyed color palette (stable by code)
+l4_lookup <- eco_l4 |>
+  st_drop_geometry() |>
+  dplyr::distinct(us_l4code, us_l4name) |>
+  dplyr::arrange(us_l4code)
+
+pal_vals    <- scales::hue_pal(l = 70, c = 100)(nrow(l4_lookup))
+fill_colors <- stats::setNames(pal_vals, l4_lookup$us_l4code)   # names = codes
+
+# Org palette (sites)
+org_levels <- sort(unique(as.character(sites_with_eco$org)))
+org_colors <- if (length(org_levels) <= 9) {
+  pal <- RColorBrewer::brewer.pal(max(3, length(org_levels)), "Set1")
+  pal[seq_along(org_levels)]
+} else scales::hue_pal()(length(org_levels))
+names(org_colors) <- org_levels
+
+ggplot() +
+  # --- L4 Polygons (fill by Level IV code; legend hidden) ---
+  geom_sf(data = eco_l4, aes(fill = us_l4code), color = NA, alpha = 0.85, show.legend = FALSE) +
+  scale_fill_manual(values = fill_colors, breaks = l4_lookup$us_l4code, labels = l4_lookup$us_l4name) +
+
+  # Sites: fill scale for the site points
+  ggnewscale::new_scale_fill() +
+
+  # Sites (filled circle with black halo) 
+  geom_sf(
+    data  = sites_with_eco,
+    aes(fill = org),
+    shape = 21,            # filled point with outline
+    color = "black",       # outline (halo)
+    stroke = 0.7,          # outline thickness
+    size  = 3.6,           # point size
+    alpha = 0.96
+  ) +
+  scale_fill_manual(name = "CA Sentinel Sites", values = org_colors) +
+
+  # North arrow & scale bar
+  annotation_north_arrow(
+    location   = "bl",
+    which_north = "true",
+    height     = unit(2.0, "cm"),
+    width      = unit(1.5, "cm"),
+    pad_x      = unit(1, "cm"),
+    pad_y      = unit(4, "cm"),
+    style      = north_arrow_orienteering
+  ) +
+  annotation_scale(
+    location   = "bl",
+    width_hint = 0.3,
+    bar_cols   = c("grey40", "white"),
+    pad_x      = unit(0.5, "cm"),
+    pad_y      = unit(2, "cm"),
+    text_cex   = 2
+  ) +
+
+  coord_sf(expand = FALSE) +
+  theme_void() +
+  theme(
+    legend.position   = c(0.7, 0.8),   # org legend location
+    legend.box        = "vertical",
+    legend.title      = element_text(size = 25, face = "bold"),
+    legend.text       = element_text(size = 22),
+    legend.key.size   = unit(1, "cm"),
+    plot.margin       = unit(c(0.4, 0.8, 0.4, 0.6), "cm")
+  ) +
+  guides(
+    fill = guide_legend(override.aes = list(shape = 21, size = 6, color = "black", stroke = 0.9))
+  )
+```
+
+```{r, fig.width=30, fig.height=14}
+
+# Separate legend panel:
+
+
+# Reuse l4_lookup and fill_colors from the map chunk (do NOT regenerate)
+stopifnot(exists("l4_lookup"), exists("fill_colors"))
+
+l4_df <- l4_lookup |>
+  mutate(color = fill_colors[us_l4code])
+
+# ---- One-page, multi-column swatch legend (readable, compact) ----
+n_items      <- nrow(l4_df)
+n_cols_page  <- 7                       # adjust 6–8 as needed
+rows_per_col <- ceiling(n_items / n_cols_page)
+
+wrap_width   <- 30
+row_height   <- 0.95
+swatch_size  <- 10
+text_size    <- 5
+line_h       <- 1.08
+label_dx     <- 0.05
+col_spacing  <- 1
+col_x        <- seq(1, by = col_spacing, length.out = n_cols_page)
+
+dat <- l4_df |>
+  mutate(
+    item = row_number(),
+    col  = ((item - 1) %/% rows_per_col) + 1L,
+    row  = ((item - 1) %% rows_per_col) + 1L,
+    x    = col_x[pmin(col, length(col_x))],
+    y    = -(row * row_height),
+    lx   = x + label_dx,
+    label = stringr::str_wrap(us_l4name, width = wrap_width)
+  )
+
+y_min <- -(rows_per_col * row_height) - 0.5
+y_max <- 0.4
+x_min <- min(col_x) - 0.3
+x_max <- max(col_x) + 1.8
+
+ggplot(dat) +
+  # color swatch (square) — EXACT SAME COLORS as map via fill_colors[code]
+  geom_point(aes(x = x, y = y), shape = 22, size = swatch_size,
+             fill = dat$color, color = "grey30") +
+  # label text (L4 name)
+  geom_text(aes(x = lx, y = y, label = label),
+            hjust = 0, vjust = 0.5, size = text_size, lineheight = line_h) +
+  coord_cartesian(xlim = c(x_min, x_max), ylim = c(y_min, y_max), expand = FALSE) +
+  theme_void() +
+  theme(
+    plot.margin = unit(c(0.6, 1.0, 0.6, 0.6), "cm"),
+    plot.title  = element_text(hjust = 0, face = "bold", size = 14)
+  ) +
+  labs(title = "US EPA Level IV ecoregions")
+
+
+
+```
+
+## Step 4: Explore coverage and identify gaps
+
+### 4a:
+
+```{r step-4a}
+
+# Step 3a — Basic coverage summary for Level III and Level IV ecoregions
+
+# Load dependencies
+for (p in c("sf","dplyr","gt")) {
+  if (!requireNamespace(p, quietly = TRUE)) install.packages(p)
+}
+suppressPackageStartupMessages({
+  library(sf); library(dplyr); library(gt)
+})
+
+# Confirm that input objects exist
+stopifnot(exists("sites_with_eco"), exists("eco"))
+
+# ---------------------------------------------------------------------------
+# Compute coverage counts
+# ---------------------------------------------------------------------------
+
+# All unique ecoregions in California
+all_L3 <- eco |> st_drop_geometry() |> distinct(us_l3code, us_l3name)
+all_L4 <- eco |> st_drop_geometry() |> distinct(us_l4code, us_l4name)
+
+# Ecoregions represented by at least one Sentinel Site
+covered_L3 <- sites_with_eco |> st_drop_geometry() |>
+  filter(!is.na(us_l3code)) |> distinct(us_l3code, us_l3name)
+covered_L4 <- sites_with_eco |> st_drop_geometry() |>
+  filter(!is.na(us_l4code)) |> distinct(us_l4code, us_l4name)
+
+# Build summary table
+summary_tbl <- tibble::tibble(
+  Metric  = c("Level III ecoregions", "Level IV ecoregions"),
+  Covered = c(nrow(covered_L3), nrow(covered_L4)),
+  Total   = c(nrow(all_L3), nrow(all_L4)),
+  Missing = c(nrow(all_L3) - nrow(covered_L3),
+              nrow(all_L4) - nrow(covered_L4))
+) |>
+  mutate(
+    Coverage = paste0(Covered, " of ", Total),
+    `Missing ecoregions` = Missing
+  ) |>
+  select(Metric, Coverage, `Missing ecoregions`)
+
+# ---------------------------------------------------------------------------
+# Display formatted table
+# ---------------------------------------------------------------------------
+
+summary_tbl |>
+  gt() |>
+  tab_header(
+    title = md("**Sentinel Site coverage across US EPA ecoregions**"),
+    subtitle = "Counts of Level III and IV ecoregions represented by at least one Sentinel Site"
+  ) |>
+  fmt_number(columns = "Missing ecoregions", decimals = 0) |>
+  cols_align(align = "center", columns = everything()) |>
+  cols_width(
+    Metric ~ px(240),
+    Coverage ~ px(140),
+    `Missing ecoregions` ~ px(160)
+  )
+
+```
+
+### 4b: covered ecoregions
+
+```{r step-4b-covered ecoregions, fig.width=20}
+
+# Step 4b — Level IV ecoregions covered vs. not covered (side-by-side table)
+
+# ---- All Level IV ecoregions from the source layer ----
+all_L4 <- eco |>
+  st_drop_geometry() |>
+  distinct(us_l4name) |>
+  arrange(us_l4name)
+
+# ---- Covered Level IV (at least one Sentinel Site) ----
+covered_L4 <- sites_with_eco |>
+  st_drop_geometry() |>
+  filter(!is.na(us_l4code)) |>
+  distinct(us_l4name) |>
+  arrange(us_l4name)
+
+# ---- Not covered (gaps) ----
+gaps_L4 <- all_L4 |>
+  anti_join(covered_L4, by = "us_l4name") |>
+  arrange(us_l4name)
+
+# ---- Build two equal-length columns (blank if no value) ----
+covered_vec <- covered_L4$us_l4name
+gaps_vec    <- gaps_L4$us_l4name
+
+n_max <- max(length(covered_vec), length(gaps_vec))
+covered_vec <- c(covered_vec, rep(NA_character_, n_max - length(covered_vec)))
+gaps_vec    <- c(gaps_vec,    rep(NA_character_, n_max - length(gaps_vec)))
+
+tbl_L4 <- tibble::tibble(
+  `Level IV ecoregions — Covered`     = covered_vec,
+  `Level IV ecoregions — Not covered` = gaps_vec
+) |>
+  mutate(across(everything(), ~replace_na(.x, "")))  # show blanks instead of "NA"
+
+# ---- Summary (fixed denominator shown as /180, as requested) ----
+total_L4_display <- 180L
+n_cov <- nrow(covered_L4)
+n_gap <- nrow(gaps_L4)
+pct_cov <- round(100 * n_cov / total_L4_display, 1)
+pct_gap <- round(100 * n_gap / total_L4_display, 1)
+
+# ---- Render table ----
+tbl_L4 |>
+  gt() |>
+  tab_header(
+    title = md("**Level IV Ecoregion Coverage**"),
+    subtitle = md(paste0(
+      "**Covered:** ", n_cov, " / ", total_L4_display, " (", pct_cov, "%)",
+      "  •  ",
+      "**Not covered:** ", n_gap, " / ", total_L4_display, " (", pct_gap, "%)"
+    ))
+  ) |>
+  cols_align(columns = everything(), align = "left") |>
+  cols_width(everything() ~ px(520)) |>
+  tab_options(
+    table.width = pct(100),
+    data_row.padding = px(4),
+    column_labels.font.weight = "bold"
+  )
+
+```
+
+```{r}
+
+# Step 4c — Side-by-side maps of Level IV ecoregions: Covered vs Not covered
+
+# Deps
+for (p in c("ggplot2","dplyr","sf","patchwork","ggspatial")) {
+  if (!requireNamespace(p, quietly = TRUE)) install.packages(p)
+}
+suppressPackageStartupMessages({
+  library(ggplot2); library(dplyr); library(sf)
+  library(patchwork); library(ggspatial)
+})
+
+# Preconditions
+stopifnot(exists("eco"), exists("sites_with_eco"))
+
+# Build Level IV polygons (unique code + name)
+eco_l4 <- eco |>
+  st_make_valid() |>
+  dplyr::group_by(us_l4code, us_l4name) |>
+  dplyr::summarise(.groups = "drop")
+
+# Ensure both layers share CRS
+if (!is.na(st_crs(eco_l4)) && !is.na(st_crs(sites_with_eco)) && st_crs(eco_l4) != st_crs(sites_with_eco)) {
+  sites_with_eco <- st_transform(sites_with_eco, st_crs(eco_l4))
+}
+
+# Identify covered vs not covered L4 codes
+covered_codes <- sites_with_eco |>
+  st_drop_geometry() |>
+  dplyr::filter(!is.na(us_l4code)) |>
+  dplyr::distinct(us_l4code) |>
+  dplyr::pull(us_l4code)
+
+eco_l4_status <- eco_l4 |>
+  dplyr::mutate(
+    coverage = ifelse(us_l4code %in% covered_codes, "Covered", "Not covered")
+  )
+
+# A single, simple 2-class palette (consistent across both maps)
+cov_palette <- c("Covered" = "#2C7FB8",         # blue
+                 "Not covered" = "#D95F02")     # orange
+
+# Base theme (no axes) and shared guide
+base_theme <- list(
+  coord_sf(expand = FALSE),
+  theme_void(),
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text  = element_text(size = 10),
+    plot.title   = element_text(size = 14, face = "bold", hjust = 0)
+  ),
+  guides(fill = guide_legend(override.aes = list(color = NA)))
+)
+
+# Map A — highlight COVERED (non-covered muted)
+p_cov <- ggplot() +
+  geom_sf(data = eco_l4_status |> dplyr::filter(coverage == "Not covered"),
+          fill = "grey90", color = NA, alpha = 1) +
+  geom_sf(data = eco_l4_status |> dplyr::filter(coverage == "Covered"),
+          aes(fill = coverage), color = NA, alpha = 0.9) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         height = unit(0.9, "cm"), width = unit(0.9, "cm"),
+                         pad_x = unit(0.8, "cm"), pad_y = unit(0.8, "cm"),
+                         style = north_arrow_orienteering) +
+  annotation_scale(location = "bl", width_hint = 0.25,
+                   bar_cols = c("grey40", "white"),
+                   pad_x = unit(0.8, "cm"), pad_y = unit(1.7, "cm"),
+                   text_cex = 0.8) +
+  scale_fill_manual(name = "Level IV coverage", values = cov_palette, drop = FALSE) +
+  ggtitle("Covered Level IV ecoregions") +
+  base_theme
+
+# Map B — highlight GAPS (covered muted)
+p_gap <- ggplot() +
+  geom_sf(data = eco_l4_status |> dplyr::filter(coverage == "Covered"),
+          fill = "grey90", color = NA, alpha = 1) +
+  geom_sf(data = eco_l4_status |> dplyr::filter(coverage == "Not covered"),
+          aes(fill = coverage), color = NA, alpha = 0.9) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         height = unit(0.9, "cm"), width = unit(0.9, "cm"),
+                         pad_x = unit(0.8, "cm"), pad_y = unit(0.8, "cm"),
+                         style = north_arrow_orienteering) +
+  annotation_scale(location = "bl", width_hint = 0.25,
+                   bar_cols = c("grey40", "white"),
+                   pad_x = unit(0.8, "cm"), pad_y = unit(1.7, "cm"),
+                   text_cex = 0.8) +
+  scale_fill_manual(name = "Level IV coverage", values = cov_palette, drop = FALSE) +
+  ggtitle("Not covered (gaps) Level IV ecoregions") +
+  base_theme
+
+# Arrange side-by-side and share the legend
+(p_cov + p_gap) +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "right")
+
+```

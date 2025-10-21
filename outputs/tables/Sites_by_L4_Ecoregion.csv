@@ -1,0 +1,81 @@
+site_id,site_name,org,us_l3code,us_l3name,us_l4code,us_l4name
+SSN_CDFW_24,Fish Slough Ecological Reserve,CDFW,13,Central Basin and Range,13ae,Bishop Volcanic Tableland
+SSN_CDFW_2,Honey Lake Wildlife Area,CDFW,13,Central Basin and Range,13aa,Sierra Nevada-Influenced Semiarid Hills and Basins
+SSN_CDFW_32,Hallelujah Junction Wildlife Area,CDFW,13,Central Basin and Range,13aa,Sierra Nevada-Influenced Semiarid Hills and Basins
+SSN_CDFW_23,Carrizo Plains Ecological Reserve,CDFW,6,Central California Foothills and Coastal Mountains,6ao,Caliente Range
+SSN_CDFW_5,Cañada de Los Osos Ecological Reserve,CDFW,6,Central California Foothills and Coastal Mountains,6r,East Bay Hills/Western Diablo Range
+SSN_CDFW_26,Watsonville Slough Ecological Reserve,CDFW,6,Central California Foothills and Coastal Mountains,6w,Monterey Bay Plains and Terraces
+SSN_CDFW_38,Elkhorn Slough Ecological Reserve,CDFW,6,Central California Foothills and Coastal Mountains,6w,Monterey Bay Plains and Terraces
+SSN_CDFW_28,Napa-Sonoma Marshes Wildlife Area,CDFW,6,Central California Foothills and Coastal Mountains,6l,Napa-Sonoma-Russian River Valleys
+SSN_CDFW_4,Spenceville Wildlife Area,CDFW,6,Central California Foothills and Coastal Mountains,6b,Northern Sierran Foothills
+SSN_CDFW_6,Big Sandy Wildlife Area,CDFW,6,Central California Foothills and Coastal Mountains,6ak,Paso Robles Hills and Valleys
+SSN_CDFW_33,Burton Mesa Ecological Reserve,CDFW,6,Central California Foothills and Coastal Mountains,6ap,Solomon-Purisima-Santa Ynez Hills
+SSN_CDFW_8,Big Table Mountain Ecological Reserve,CDFW,6,Central California Foothills and Coastal Mountains,6c,Southern Sierran Foothills
+SSN_CDFW_3,Tehama Wildlife Area,CDFW,6,Central California Foothills and Coastal Mountains,6a,Tuscan Flows
+SSN_CDFW_30,Upper Butte Basin Wildlife Area,CDFW,7,Central California Valley,7c,Butte Sink/Sutter and Colusa Basins
+SSN_CDFW_17,Cosumnes River Ecological Reserve,CDFW,7,Central California Valley,7a,Northern Terraces
+SSN_CDFW_12,North Grasslands Wildlife Area,CDFW,7,Central California Valley,7m,San Joaquin Basin
+SSN_CDFW_13,Semitropic Ecological Reserve,CDFW,7,Central California Valley,7v,Southern Clayey Basins
+SSN_CDFW_14,Lake Earl Wildlife Area,CDFW,1,Coast Range,1a,Coastal Lowlands
+SSN_CDFW_1,Fitzhugh Creek Wildlife Area,CDFW,9,Eastern Cascades Slopes and Foothills,9o,Likely Tableland
+SSN_CDFW_15,Ash Creek Wildlife Area,CDFW,9,Eastern Cascades Slopes and Foothills,9l,Pit River Valleys
+SSN_CDFW_29,Shasta Valley Wildlife Area,CDFW,9,Eastern Cascades Slopes and Foothills,9k,Shasta Valley
+SSN_CDFW_31,McLellan Mountain Peatland,CDFW,78,Klamath Mountains/California High North Coast Range,78q,Outer North Coast Ranges
+SSN_CDFW_18,Camp Cady Wildlife Area,CDFW,14,Mojave Basin and Range,14a,Eastern Mojave Basins
+SSN_CDFW_19,Indian Joe Springs Ecological Reserve,CDFW,14,Mojave Basin and Range,14k,Western Mojave Low Ranges and Arid Footslopes
+SSN_CDFW_11,Great Basin Springs (Five Springs),CDFW,80,Northern Basin and Range,80g,High Lava Plains
+SSN_CDFW_22,Canebrake Ecological Reserve,CDFW,5,Sierra Nevada,5i,Eastern Sierra Great Basin Slopes
+SSN_CDFW_16,Pickel Meadow Wildlife Area,CDFW,5,Sierra Nevada,5f,Northeastern Sierra Mixed Conifer-Pine Forests
+SSN_CDFW_10,Hope Valley Wildlife Area,CDFW,5,Sierra Nevada,5c,Northern Sierra Upper Montane Forests
+SSN_CDFW_7,Monache Meadows Wildlife Area,CDFW,5,Sierra Nevada,5l,Southern Sierra Upper Montane Forests
+SSN_CDFW_27,Imperial Wildlife Area,CDFW,81,Sonoran Basin and Range,81f,Imperial/Lower Coachella Valleys
+SSN_CDFW_9,Palo Verde Ecological Reserve,CDFW,81,Sonoran Basin and Range,81g,Lower Colorado/Gila River Valleys
+SSN_CDFW_25,San Felipe Creek Ecological Reserve,CDFW,81,Sonoran Basin and Range,81c,Western Sonoran Basins
+SSN_CDFW_37,San Felipe Valley Wildlife Area,CDFW,81,Sonoran Basin and Range,81b,Western Sonoran Mountain Woodland and Shrubland
+SSN_CDFW_20,San Elijo Lagoon Ecological Reserve,CDFW,85,Southern California/Northern Baja Coast,85e,Diegan Coastal Terraces
+SSN_CDFW_21,Sycuan Peak Ecological Reserve,CDFW,85,Southern California/Northern Baja Coast,85g,Diegan Western Granitic Foothills
+SSN_CDFW_34,Canada de San Vicente Ecological Reserve,CDFW,85,Southern California/Northern Baja Coast,85g,Diegan Western Granitic Foothills
+SSN_CDFW_36,Rancho Jamul Ecological Reserve,CDFW,85,Southern California/Northern Baja Coast,85g,Diegan Western Granitic Foothills
+SSN_CDFW_39,Upper Newport Bay Ecological Reserve,CDFW,85,Southern California/Northern Baja Coast,85d,Los Angeles Plain
+SSN_CDFW_35,Cienega Springs Ecological Reserve,CDFW,85,Southern California/Northern Baja Coast,85b,Oxnard Plain and Valleys
+SSN_Pepperwood_80,Pepperwood Preserve,Pepperwood,6,Central California Foothills and Coastal Mountains,6j,Mayacmas Mountains
+SSN_TNC_77,Dangermond @ Jalama HQ,TNC,6,Central California Foothills and Coastal Mountains,6ap,Solomon-Purisima-Santa Ynez Hills
+SSN_TNC_78,Santa Cruz Island @ Diablo Peak,TNC,85,Southern California/Northern Baja Coast,85i,Northern Channel Islands
+SSN_TNC_79,Santa Cruz Island @ Sierra Blanca,TNC,85,Southern California/Northern Baja Coast,85i,Northern Channel Islands
+SSN_UCNRS_59,Lassen Field Station,UCNRS,4,Cascades,4e,High Southern Cascades Montane Forest
+SSN_UCNRS_69,Sierra Nevada Aquatic Research Lab,UCNRS,13,Central Basin and Range,13aa,Sierra Nevada-Influenced Semiarid Hills and Basins
+SSN_UCNRS_74,White Mountain Research Center,UCNRS,13,Central Basin and Range,13ac,Upper Owens Valley
+SSN_UCNRS_43,Blue Oak Ranch Reserve,UCNRS,6,Central California Foothills and Coastal Mountains,6r,East Bay Hills/Western Diablo Range
+SSN_UCNRS_71,Strathearn,UCNRS,6,Central California Foothills and Coastal Mountains,6r,East Bay Hills/Western Diablo Range
+SSN_UCNRS_63,Quail Ridge Reserve,UCNRS,6,Central California Foothills and Coastal Mountains,6f,Foothill Ridges and Valleys
+SSN_UCNRS_70,Stebbins Cold Canyon Reserve,UCNRS,6,Central California Foothills and Coastal Mountains,6f,Foothill Ridges and Valleys
+SSN_UCNRS_51,Fort Ord,UCNRS,6,Central California Foothills and Coastal Mountains,6w,Monterey Bay Plains and Terraces
+SSN_UCNRS_76,Younger Lagoon,UCNRS,6,Central California Foothills and Coastal Mountains,6w,Monterey Bay Plains and Terraces
+SSN_UCNRS_60,McLaughlin Reserve,UCNRS,6,Central California Foothills and Coastal Mountains,6g,North Coast Range Eastern Slopes
+SSN_UCNRS_53,Hastings Natural Reservation,UCNRS,6,Central California Foothills and Coastal Mountains,6ag,Northern Santa Lucia Range
+SSN_UCNRS_58,Landels Hill Big Creek Reserve,UCNRS,6,Central California Foothills and Coastal Mountains,6ah,Santa Lucia Coastal Forest and Woodland
+SSN_UCNRS_68,Sedgwick Reserve,UCNRS,6,Central California Foothills and Coastal Mountains,6ap,Solomon-Purisima-Santa Ynez Hills
+SSN_UCNRS_56,Ken Norris Rancho Marino Reserve,UCNRS,6,Central California Foothills and Coastal Mountains,6aj,Southern Santa Lucia Range
+SSN_UCNRS_61,Merced Vernal Pools,UCNRS,7,Central California Valley,7d,Southern Hardpan Terraces
+SSN_UCNRS_55,Jepson Praire Reserve,UCNRS,7,Central California Valley,7g,Yolo Alluvial Fans
+SSN_UCNRS_40,Angelo Reserve,UCNRS,1,Coast Range,1k,Coastal Franciscan Redwood Forest
+SSN_UCNRS_44,Bodega Marine Lab and Reserve,UCNRS,1,Coast Range,1m,Point Reyes/Farallon Islands
+SSN_UCNRS_46,Burns Piñon Ridge Reserve,UCNRS,14,Mojave Basin and Range,14b,Eastern Mojave Low Ranges and Arid Footslopes
+SSN_UCNRS_52,Granites Desert Research Station,UCNRS,14,Mojave Basin and Range,14b,Eastern Mojave Low Ranges and Arid Footslopes
+SSN_UCNRS_73,Valentine Reserve,UCNRS,5,Sierra Nevada,5i,Eastern Sierra Great Basin Slopes
+SSN_UCNRS_64,Sagehen Creek Field Station,UCNRS,5,Sierra Nevada,5f,Northeastern Sierra Mixed Conifer-Pine Forests
+SSN_UCNRS_75,Yosemite Field Station,UCNRS,5,Sierra Nevada,5n,Southern Sierra Lower Montane Forest and Woodland
+SSN_UCNRS_42,Anza Borrego,UCNRS,81,Sonoran Basin and Range,81c,Western Sonoran Basins
+SSN_UCNRS_45,Boyd Deep Canyon Reserve,UCNRS,81,Sonoran Basin and Range,81a,Western Sonoran Mountains
+SSN_UCNRS_54,James Reserve,UCNRS,8,Southern California Mountains,8f,Southern California Montane Conifer Forest
+SSN_UCNRS_49,Dawson Reserve,UCNRS,85,Southern California/Northern Baja Coast,85f,Diegan Coastal Hills and Valleys
+SSN_UCNRS_50,Elliot Chaparral Reserve,UCNRS,85,Southern California/Northern Baja Coast,85e,Diegan Coastal Terraces
+SSN_UCNRS_67,Scripps Coastal Reserve,UCNRS,85,Southern California/Northern Baja Coast,85e,Diegan Coastal Terraces
+SSN_UCNRS_62,Motte Rimrock Reserve,UCNRS,85,Southern California/Northern Baja Coast,85l,Inland Hills
+SSN_UCNRS_65,San Joaquin Marsh Reserve,UCNRS,85,Southern California/Northern Baja Coast,85d,Los Angeles Plain
+SSN_UCNRS_66,Santa Cruz Island Reserve,UCNRS,85,Southern California/Northern Baja Coast,85i,Northern Channel Islands
+SSN_UCNRS_47,Carpinteria Marsh Reserve,UCNRS,85,Southern California/Northern Baja Coast,85a,Santa Barbara Coastal Plain and Terraces
+SSN_UCNRS_48,Coal Oil Point Reserve,UCNRS,85,Southern California/Northern Baja Coast,85a,Santa Barbara Coastal Plain and Terraces
+SSN_UCNRS_72,Stunt Ranch Reserve,UCNRS,85,Southern California/Northern Baja Coast,85c,Venturan-Angeleno Coastal Hills
+SSN_UCNRS_41,Ano Nuevo Island,UCNRS,NA,NA,NA,NA
+SSN_UCNRS_57,Kendal-Frost Marsh Reserve,UCNRS,NA,NA,NA,NA
