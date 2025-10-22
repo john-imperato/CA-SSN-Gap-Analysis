@@ -1,0 +1,298 @@
+---
+title: "Data preparation"
+author: "CA-SSN"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+  pdf:
+    toc: true
+editor: visual
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r setup, include=FALSE}
+# Global knitr defaults
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.align = "left")
+
+# Install/load packages once
+pkgs <- c("here","sf","dplyr","readr","janitor","stringr","rlang")
+to_install <- setdiff(pkgs, rownames(installed.packages()))
+if (length(to_install)) install.packages(to_install, dependencies = TRUE)
+
+suppressPackageStartupMessages({
+  library(here); library(sf); library(dplyr)
+  library(readr); library(janitor); library(stringr); library(rlang)
+})
+
+# Tell {here} exactly where THIS file is (adjust if your QMD is elsewhere)
+here::i_am("scripts/00_data-preparation.qmd")
+
+# Optional quick sanity print (helps if things ever break again)
+cat("Project root (dr_here):", here::dr_here(), "\n")
+
+```
+
+## 0. Paths
+
+All paths are project-relative using here::here().
+
+```{r paths}
+
+# Input folders
+in_sites_dir  <- here::here("data","SSN_site_coordinates")
+in_eco_dir    <- here::here("data","EPA_ecoregions_CA","ca_eco_l4")
+
+# Optional reference/overrides
+ref_dir       <- here::here("data","reference")
+overrides_csv <- file.path(ref_dir, "org_overrides.csv")
+has_overrides <- file.exists(overrides_csv)
+
+# Files: partner CSVs
+cdfw_csv  <- file.path(in_sites_dir, "CDFW_coords.csv")
+ucnrs_csv <- file.path(in_sites_dir, "SSN_UCNRS_coords.csv")
+tnc_csv   <- file.path(in_sites_dir, "TNC_Pepperwood_coords.csv")
+
+# EPA shapefile (all components must sit in this folder)
+eco_shp   <- file.path(in_eco_dir, "ca_eco_l4.shp")
+
+# Output folders
+out_gpkg_dir <- here::here("data","processed")
+out_tbl_dir  <- here::here("outputs","tables")
+dir.create(out_gpkg_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(out_tbl_dir,  recursive = TRUE, showWarnings = FALSE)
+
+# Output files (same names as before)
+sites_gpkg  <- file.path(out_gpkg_dir, "SSN_All_Sites.gpkg")
+sites_layer <- "SSN_All_Sites"
+sites_csv   <- file.path(out_tbl_dir,  "SSN_All_Sites.csv")
+
+eco_gpkg    <- file.path(out_gpkg_dir, "Ecoregions.gpkg")
+eco_layer   <- "EPA_L4_CA"
+
+joined_gpkg  <- file.path(out_gpkg_dir, "SSN_Sites_with_Ecoregions.gpkg")
+joined_layer <- "SSN_Sites_with_Ecoregions"
+lookup_csv   <- file.path(out_tbl_dir,  "Sites_with_Ecoregions.csv")
+
+```
+
+
+## 1. Ingest Sentinel Site points from CSVs
+
+```{r ingest-sites}
+
+# Null coalesce helper (used in name-based org classification)
+`%||%` <- function(a, b) if (!is.null(a) && length(a) > 0) a else b
+
+# Standardization helper
+standardize_sites <- function(path, org_value, site_col, lat_col, lon_col) {
+  message("Reading: ", basename(path))
+  df_raw <- readr::read_csv(path, show_col_types = FALSE) |> janitor::clean_names()
+
+  # Drop known empty columns if present
+  drop_cols <- intersect(names(df_raw), c("x4", "x5"))
+  if (length(drop_cols) > 0) df_raw <- dplyr::select(df_raw, -dplyr::all_of(drop_cols))
+
+  df <- df_raw |>
+    dplyr::rename(
+      site_name = !!rlang::sym(site_col),
+      lat       = !!rlang::sym(lat_col),
+      lon       = !!rlang::sym(lon_col)
+    ) |>
+    dplyr::mutate(
+      org = org_value,
+      lat = suppressWarnings(as.numeric(lat)),
+      lon = suppressWarnings(as.numeric(lon))
+    ) |>
+    dplyr::filter(!is.na(lat), !is.na(lon)) |>
+    dplyr::filter(dplyr::between(lat, -90, 90), dplyr::between(lon, -180, 180)) |>
+    dplyr::select(org, site_name, lon, lat, dplyr::everything()) |>
+    dplyr::distinct(org, site_name, lon, lat, .keep_all = TRUE)
+
+  df
+}
+
+# Partner datasets
+cdfw <- standardize_sites(
+  path = cdfw_csv,
+  org_value = "CDFW",
+  site_col = "cdfw_sentinel_site_property_name",
+  lat_col  = "latitute",   # typo in source
+  lon_col  = "longitude"
+)
+
+ucnrs <- standardize_sites(
+  path = ucnrs_csv,
+  org_value = "UCNRS",
+  site_col = "nrs_site_name",
+  lat_col  = "lat",
+  lon_col  = "lon"
+)
+
+# TNC/Pepperwood comes in together; classify:
+tnc_raw <- standardize_sites(
+  path = tnc_csv,
+  org_value = NA_character_,   # set after overrides/classification
+  site_col = "tnc_sentinel_site",
+  lat_col  = "latitute",       # same typo
+  lon_col  = "longitude"
+)
+
+if (has_overrides) {
+  message("Applying org overrides from: ", overrides_csv)
+  overrides <- readr::read_csv(overrides_csv, show_col_types = FALSE) |>
+    janitor::clean_names() |>
+    dplyr::select(site_name, org)
+
+  tnc <- tnc_raw |>
+    dplyr::left_join(overrides, by = "site_name") |>
+    dplyr::mutate(org = dplyr::coalesce(org.y, org.x, "TNC")) |>
+    dplyr::select(-org.x, -org.y)
+} else {
+  message("No overrides file found. Classifying TNC vs Pepperwood by name.")
+  tnc <- tnc_raw |>
+    dplyr::mutate(
+      org = dplyr::case_when(
+        stringr::str_detect(tolower(site_name %||% ""), "pepperwood") ~ "Pepperwood",
+        TRUE                                                          ~ "TNC"
+      )
+    )
+}
+
+# Combine & finalize
+sites_combined <- dplyr::bind_rows(cdfw, ucnrs, tnc) |>
+  dplyr::mutate(
+    org = as.character(org),
+    site_id = paste0("SSN_", org, "_", dplyr::row_number())
+  ) |>
+  dplyr::select(org, site_id, site_name, lon, lat, dplyr::everything())
+
+message("Row counts by org:")
+print(sites_combined |> dplyr::count(org, sort = TRUE))
+
+# Convert to sf (EPSG:4326)
+sites_sf <- sf::st_as_sf(sites_combined, coords = c("lon","lat"), crs = 4326, remove = FALSE)
+
+# Write outputs (same names/locations)
+if (file.exists(sites_gpkg)) try(sf::st_delete(sites_gpkg, layer = sites_layer), silent = TRUE)
+sf::st_write(sites_sf, sites_gpkg, layer = sites_layer, delete_layer = TRUE, quiet = TRUE)
+readr::write_csv(sf::st_drop_geometry(sites_sf), sites_csv)
+
+cat("Wrote GeoPackage:", normalizePath(sites_gpkg), "\n")
+cat("Wrote CSV:       ", normalizePath(sites_csv),  "\n")
+
+```
+
+
+## 2. Load EPA Level IV ecoregions and write GeoPackage
+
+
+```{r load-ecoregions}
+
+# Read EPA Level IV shapefile, retain parent Level III attributes, standardize names, write to GPKG
+
+stopifnot(file.exists(eco_shp))
+
+# 1) Read + clean
+eco_raw <- sf::st_read(eco_shp, quiet = TRUE) |> janitor::clean_names()
+cat("EPA polygons read:", nrow(eco_raw), "| CRS:", sf::st_crs(eco_raw)$input, "\n")
+
+# 2) Detect key columns (robust to naming variants)
+pick_one <- function(pattern, x) grep(pattern, x, ignore.case = TRUE, value = TRUE)[1]
+
+nm <- names(eco_raw)
+l4_code_col <- pick_one("(^us_?l4_?code$|l4code)", nm)
+l4_name_col <- pick_one("(^us_?l4_?name$|l4name)", nm)
+l3_code_col <- pick_one("(^us_?l3_?code$|l3code)", nm)
+l3_name_col <- pick_one("(^us_?l3_?name$|l3name)", nm)
+
+stopifnot(!is.na(l4_code_col), !is.na(l4_name_col))  # L4 code & name are required
+if (is.na(l3_name_col) && is.na(l3_code_col)) {
+  stop("No Level III (name/code) field found in ecoregion data — cannot retain L3 parent info.")
+}
+
+# 3) Standardize column names for downstream scripts
+eco_std <- eco_raw |>
+  dplyr::rename(
+    us_l4code = !!rlang::sym(l4_code_col),
+    us_l4name = !!rlang::sym(l4_name_col),
+    !!!setNames(
+      list(rlang::sym(l3_code_col)), "us_l3code"
+    )[!is.na(l3_code_col)],
+    !!!setNames(
+      list(rlang::sym(l3_name_col)), "us_l3name"
+    )[!is.na(l3_name_col)]
+  )
+
+# 4) Dissolve to Level IV while KEEPING Level III parent info
+grp_vars <- c("us_l4code","us_l4name", intersect(c("us_l3code","us_l3name"), names(eco_std)))
+
+eco_l4_with_l3 <- eco_std |>
+  sf::st_make_valid() |>
+  dplyr::group_by(dplyr::across(dplyr::all_of(grp_vars))) |>
+  dplyr::summarise(.groups = "drop")
+
+# 5) Transform to WGS84
+eco_wgs84 <- sf::st_transform(eco_l4_with_l3, 4326)
+
+# 6) Write to GeoPackage (overwrite layer if present)
+if (file.exists(eco_gpkg)) try(sf::st_delete(eco_gpkg, layer = eco_layer), silent = TRUE)
+sf::st_write(eco_wgs84, eco_gpkg, layer = eco_layer, delete_layer = TRUE, quiet = TRUE)
+
+# 7) Brief report
+cat("Wrote ecoregions to:", normalizePath(eco_gpkg), "(layer:", eco_layer, ")\n")
+cat("Distinct L3 (names):", if ("us_l3name" %in% names(eco_wgs84)) dplyr::n_distinct(eco_wgs84$us_l3name) else 0, "\n")
+cat("Distinct L4 (codes):", dplyr::n_distinct(eco_wgs84$us_l4code), "\n")
+
+```
+
+## 3. Spatial join (Sentinel Sites x EPA ecoregions)
+
+```{r join-sites-ecoregions}
+
+# Reload from processed to ensure we use the canonical on-disk copies
+sites <- sf::st_read(sites_gpkg, layer = sites_layer, quiet = TRUE) |> janitor::clean_names()
+eco   <- sf::st_read(eco_gpkg,   layer = eco_layer,   quiet = TRUE) |> janitor::clean_names() |> sf::st_make_valid()
+
+# Align CRS if needed
+if (!is.na(sf::st_crs(sites)) && !is.na(sf::st_crs(eco)) && sf::st_crs(sites) != sf::st_crs(eco)) {
+  sites <- sf::st_transform(sites, sf::st_crs(eco))
+}
+
+# Keep only key EPA fields if present
+need <- c("us_l4code","us_l4name","l4_key","us_l3code","us_l3name","l3_key")
+eco_keep <- if (all(need %in% names(eco))) dplyr::select(eco, dplyr::all_of(need)) else eco
+
+# Join
+sites_with_eco <- sf::st_join(
+  x = sites,
+  y = eco_keep,
+  join = sf::st_intersects,
+  left = TRUE,
+  largest = TRUE
+)
+
+n_unmatched <- sum(is.na(sites_with_eco$us_l4code))
+cat("Spatial join complete —", nrow(sites_with_eco), "sites;", n_unmatched, "unmatched\n")
+
+# Write joined spatial and tabular outputs (same names/locations as before)
+if (file.exists(joined_gpkg)) try(sf::st_delete(joined_gpkg, layer = joined_layer), silent = TRUE)
+sf::st_write(sites_with_eco, joined_gpkg, layer = joined_layer, delete_layer = TRUE, quiet = TRUE)
+cat("Wrote joined GeoPackage:", normalizePath(joined_gpkg), "\n")
+
+site_lookup <- sites_with_eco |>
+  sf::st_drop_geometry() |>
+  dplyr::select(site_id, site_name, org,
+                us_l3code, us_l3name,
+                us_l4code, us_l4name) |>
+  dplyr::arrange(org, us_l3name, us_l4name)
+
+readr::write_csv(site_lookup, lookup_csv)
+cat("Wrote lookup table:", normalizePath(lookup_csv), "\n")
+
+```
+
