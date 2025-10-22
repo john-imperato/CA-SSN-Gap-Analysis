@@ -1,5 +1,5 @@
 ---
-title: "CA-SSN Gap Analysis – Ecoregion Loading"
+title: "Prepare gap analysis data"
 author: "John Imperato"
 format:
   html:
@@ -165,6 +165,109 @@ if(invalid_geoms > 0) {
 
 cat("\n=== EXPLORATION COMPLETE ===\n")
 
+```
+
+## 1. Load data
+
+Load the processed Sentinel Sites and EPA ecoregions, clean field names, and align CRS so layers match.
+
+```{r step-01-load, message=FALSE, warning=FALSE}
+
+# Minimal, robust loader using the .here sentinel
+for (p in c("here","sf","janitor")) if (!requireNamespace(p, quietly = TRUE)) install.packages(p)
+library(here); library(sf); library(janitor)
+
+sites_gpkg <- here::here("data","processed","SSN_All_Sites.gpkg")
+eco_gpkg   <- here::here("data","processed","Ecoregions.gpkg")
+
+sites <- st_read(sites_gpkg, layer = "SSN_All_Sites", quiet = TRUE) |> clean_names()
+eco   <- st_read(eco_gpkg,   layer = "EPA_L4_CA",     quiet = TRUE) |> clean_names() |> st_make_valid()
+
+if (!is.na(st_crs(sites)) && !is.na(st_crs(eco)) && st_crs(sites) != st_crs(eco)) {
+  sites <- st_transform(sites, st_crs(eco))
+}
+
+```
+
+## 2. Spatial join (Sentinel Sites × US EPA ecoregions)
+
+Attach Level III and Level IV ecoregion attributes to each Sentinel Site using an intersects join.
+
+### 2a. Perform join
+
+```{r step-02a-spatial-join, message=FALSE, warning=FALSE}
+
+# Step 2a — Spatial join (Sentinel Sites × EPA Level IV ecoregions)
+library(dplyr); library(sf)
+
+need <- c("us_l4code","us_l4name","l4_key","us_l3code","us_l3name","l3_key")
+eco_keep <- if (all(need %in% names(eco))) dplyr::select(eco, dplyr::all_of(need)) else eco
+
+sites_with_eco <- sf::st_join(
+  x = sites,
+  y = eco_keep,
+  join = sf::st_intersects,
+  left = TRUE,
+  largest = TRUE
+)
+
+n_unmatched <- sum(is.na(sites_with_eco$us_l4code))
+cat("Spatial join complete —", nrow(sites_with_eco), "sites processed;", n_unmatched, "unmatched.\n")
+
+```
+
+### 2b. Inspect joined data
+
+```{r step-02b-inspect, message=FALSE, warning=FALSE}
+
+# Step 2b — Inspect joined data (quick QA only)
+library(dplyr); library(sf)
+
+cat("Rows:", nrow(sites_with_eco), "| Columns:", ncol(sites_with_eco), "\n")
+print(head(names(sites_with_eco), 15))
+
+print(
+  sites_with_eco |>
+    sf::st_drop_geometry() |>
+    dplyr::select(org, contains("l3"), contains("l4")) |>
+    head(10)
+)
+
+eco_counts <- sites_with_eco |>
+  sf::st_drop_geometry() |>
+  dplyr::summarise(
+    n_L3 = dplyr::n_distinct(us_l3code, na.rm = TRUE),
+    n_L4 = dplyr::n_distinct(us_l4code, na.rm = TRUE)
+  )
+print(eco_counts)
+
+n_unmatched <- sum(is.na(sites_with_eco$us_l4code))
+cat("Unmatched sites (no L4):", n_unmatched, "\n")
+
+```
+
+### 2c. Save joined outputs
+
+```{r step-02c-save-joined, message=FALSE, warning=FALSE}
+# Step 3 — Save joined outputs (GeoPackage + lookup CSV)
+
+gpkg_out   <- here::here("data","processed","SSN_Sites_with_Ecoregions.gpkg")
+layer_name <- "SSN_Sites_with_Ecoregions"
+tbl_dir    <- here::here("outputs","tables")
+dir.create(tbl_dir, recursive = TRUE, showWarnings = FALSE)
+
+if (file.exists(gpkg_out)) try(sf::st_delete(gpkg_out, layer = layer_name), silent = TRUE)
+sf::st_write(sites_with_eco, gpkg_out, layer = layer_name, delete_layer = TRUE, quiet = TRUE)
+cat("Wrote GeoPackage:", normalizePath(gpkg_out), "\n")
+
+site_lookup <- sites_with_eco |>
+  sf::st_drop_geometry() |>
+  dplyr::select(site_id, site_name, org, us_l3code, us_l3name, us_l4code, us_l4name) |>
+  dplyr::arrange(org, us_l3name, us_l4name)
+
+csv_out <- file.path(tbl_dir, "Sites_with_Ecoregions.csv")
+readr::write_csv(site_lookup, csv_out)
+cat("Wrote lookup table:", normalizePath(csv_out), "\n")
 ```
 
 

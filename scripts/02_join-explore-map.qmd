@@ -4,7 +4,30 @@ format: pdf
 editor: visual
 ---
 
-## Step 1: Load data
+```{r setup, include=FALSE}
+
+# Global knitr defaults
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.align = "center")
+
+# Helper to install missing packages
+pkg_needed <- c(
+  "here","sf","janitor","dplyr","ggplot2","RColorBrewer","scales",
+  "ggspatial","ggnewscale","patchwork","gt","tidyr","stringr","readr"
+)
+pkg_to_install <- setdiff(pkg_needed, rownames(installed.packages()))
+if (length(pkg_to_install)) install.packages(pkg_to_install, dependencies = TRUE)
+
+# Load libraries once for the whole document
+suppressPackageStartupMessages({
+  library(here); library(sf); library(janitor); library(dplyr)
+  library(ggplot2); library(RColorBrewer); library(scales)
+  library(ggspatial); library(ggnewscale); library(patchwork)
+  library(gt); library(tidyr); library(stringr); library(readr)
+})
+
+```
+
+## 1. Load data
 
 Load the processed Sentinel Sites and EPA ecoregions, clean field names, and align CRS so layers match.
 
@@ -26,11 +49,11 @@ if (!is.na(st_crs(sites)) && !is.na(st_crs(eco)) && st_crs(sites) != st_crs(eco)
 
 ```
 
-## Step 2: Spatial join (Sentinel Sites × US EPA ecoregions)
+## 2. Spatial join (Sentinel Sites × US EPA ecoregions)
 
 Attach Level III and Level IV ecoregion attributes to each Sentinel Site using an intersects join.
 
-### 2a: Perform join
+### 2a. Perform join
 
 ```{r step-02a-spatial-join, message=FALSE, warning=FALSE}
 
@@ -53,7 +76,7 @@ cat("Spatial join complete —", nrow(sites_with_eco), "sites processed;", n_unm
 
 ```
 
-### 2b: Inspect joined data
+### 2b. Inspect joined data
 
 ```{r step-02b-inspect, message=FALSE, warning=FALSE}
 
@@ -83,7 +106,7 @@ cat("Unmatched sites (no L4):", n_unmatched, "\n")
 
 ```
 
-### 2c: Save joined outputs
+### 2c. Save joined outputs
 
 ```{r step-02c-save-joined, message=FALSE, warning=FALSE}
 # Step 3 — Save joined outputs (GeoPackage + lookup CSV)
@@ -107,9 +130,9 @@ readr::write_csv(site_lookup, csv_out)
 cat("Wrote lookup table:", normalizePath(csv_out), "\n")
 ```
 
-## Step 3: Visualize the data
+## 3. Visualize the data
 
-### 3a: Map Sentinel sites on level III ecoregions
+### 3a. Map Sentinel sites on level III ecoregions
 
 ```{r step-03a-map-L3-SSN, message=FALSE, warning=FALSE, fig.width=14, fig.height=14}
 
@@ -192,7 +215,7 @@ ggplot() +
 
 ```
 
-### 3b: Map Sentinel Sites on L4 ecoregions
+### 3b. Map Sentinel Sites on level IV ecoregions
 
 ```{r step-03b-map-L4-SSN, message=FALSE, warning=FALSE, fig.width=14, fig.height=14}
 
@@ -473,15 +496,6 @@ tbl_L4 |>
 ```{r}
 
 # Step 4c — Side-by-side maps of Level IV ecoregions: Covered vs Not covered
-
-# Deps
-for (p in c("ggplot2","dplyr","sf","patchwork","ggspatial")) {
-  if (!requireNamespace(p, quietly = TRUE)) install.packages(p)
-}
-suppressPackageStartupMessages({
-  library(ggplot2); library(dplyr); library(sf)
-  library(patchwork); library(ggspatial)
-})
 
 # Preconditions
 stopifnot(exists("eco"), exists("sites_with_eco"))
